@@ -1,52 +1,77 @@
 // Ignite CLI plugin for Navigation
 // ----------------------------------------------------------------------------
 
-const NPM_MODULE_NAME = 'react-native-MODULENAME'
-const NPM_MODULE_VERSION = '0.0.1'
+const DEPENDENCIES = [
+    {
+        package: 'react-navigation',
+        version: '^4.0.10'
+    },
+    {
+        package: 'react-native-reanimated',
+        version: '^1.3.0'
+    },
+    {
+        package: 'react-native-gesture-handler',
+        version: '^1.4.1'
+    },
+    {
+        package: 'react-native-screens',
+        version: '^1.0.0-alpha.23'
+    },
+    {
+        package: 'react-navigation-stack',
+        version: '^1.10.3'
+    },
+    {
+        package: 'react-navigation-tabs',
+        version: '^2.5.6'
+    },
+];
 
-// const PLUGIN_PATH = __dirname
-// const APP_PATH = process.cwd()
-
+const rnScreensPatch = `    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'\n    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'`;
 
 const add = async function (toolbox) {
-  // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
-  const { ignite } = toolbox
+    // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
+    const { ignite } = toolbox
+    const APP_PATH = process.cwd()
+    const packageJSON = require(`${APP_PATH}/package.json`)
 
-  // install an NPM module and link it
-  await ignite.addModule(NPM_MODULE_NAME, { link: true, version: NPM_MODULE_VERSION })
+    for (let index = 0; index < DEPENDENCIES.length; index++) {
+        const { package, version } = DEPENDENCIES[index];
 
-  // Example of copying templates/Navigation to app/ignite-navigation
-  // if (!toolbox.filesystem.exists(`${APP_PATH}/app/ignite-navigation`)) {
-  //   toolbox.filesystem.copy(`${PLUGIN_PATH}/templates/ignite-navigation`, `${APP_PATH}/app/ignite-navigation`)
-  // }
+        await ignite.addModule(package, { link: packageJSON.dependencies['react-native'] < '0.60.0', version })
+    }
 
-  // Example of patching a file
-  // ignite.patchInFile(`${APP_PATH}/app/config/app-config.js`, {
-  //   insert: `import '../ignite-navigation/ignite-navigation'\n`,
-  //   before: `export default {`
-  // })
+    await toolbox.system.run('pod install', { cwd: `${APP_PATH}/ios` })
+
+    // Example of patching a file
+    ignite.patchInFile(`${APP_PATH}/android/app/build.gradle`, {
+      insert: rnScreensPatch,
+      after: `implementation "com.facebook.react:react-native:.*`
+    });
 }
 
 /**
  * Remove yourself from the project.
  */
 const remove = async function (toolbox) {
-  // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
-  const { ignite } = toolbox
+    // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
+    const { ignite } = toolbox
+    const APP_PATH = process.cwd()
+    const packageJSON = require(`${APP_PATH}/package.json`)
 
-  // remove the npm module and unlink it
-  await ignite.removeModule(NPM_MODULE_NAME, { unlink: true })
+    for (let index = 0; index < DEPENDENCIES.length; index++) {
+        const { package } = DEPENDENCIES[index];
 
-  // Example of removing app/Navigation folder
-  // const removeignite-navigation = await toolbox.prompt.confirm(
-  //   'Do you want to remove app/ignite-navigation?'
-  // )
-  // if (removeignite-navigation) { toolbox.filesystem.remove(`${APP_PATH}/app/ignite-navigation`) }
+        await ignite.removeModule(package, { unlink: packageJSON.dependencies['react-native'] < '0.60.0' });
+    }
 
-  // Example of unpatching a file
-  // ignite.patchInFile(`${APP_PATH}/app/config/app-config.js`, {
-  //   delete: `import '../ignite-navigation/ignite-navigation'\n`
-  // )
+    await toolbox.system.run('pod install', { cwd: `${APP_PATH}/ios` })
+
+    // Example of unpatching a file
+    ignite.patchInFile(`${APP_PATH}/android/app/build.gradle`, {
+        delete: rnScreensPatch,
+    });
 }
 
 // Required in all Ignite CLI plugins

@@ -1,10 +1,16 @@
-# My Plugin
+# Ignite Navigation
 
-This is where you would put an intro to your plugin, and maybe a few examples of usage. 
+Adds the very popular [React Navigation](https://reactnavigation.org/) to your project!
 
-## Example
+## Adding Navigation
 
-```js
-console.log("Hello World")
+```sh
+ignite add navigation
+```
+
+## Removing Navigation
+
+```sh
+ignite remove navigation
 ```
 
