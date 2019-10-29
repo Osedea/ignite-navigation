@@ -6,20 +6,11 @@
 
 - [ ] Documentation
 - [ ] Tests
-- [ ] PR & Commit Title and Message are formatted according to [Osedea Guidelines](https://github.com/Osedea/osedea_project_coding-standards/tree/master/git)
 - [ ] Ready to Merge
 
 ## Usage
 
 <!-- How can we use this? How can we test it? If possible, give at least one code/screenshot example of what it does. -->
-
-## Design Changelog
-
-<!-- If the PR IS NOT design related, remove this section. If the PR IS design related, add a screenshot of the changed part and a screenshot of the design next to it. -->
-
-Client | Design
---- | ---
-![]() | ![]()
 
 ## Notes for Reviewers
 
