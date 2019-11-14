@@ -27,6 +27,13 @@ const DEPENDENCIES = [
         version: '^2.5.6'
     },
 ];
+const DEV_DEPENDENCIES = [
+    {
+        package: '@types/react-navigation',
+        version: '^3.0.7',
+        peerDependency: 'typescript'
+    }
+];
 
 const rnScreensPatch = `    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'\n    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'`;
 
@@ -40,6 +47,14 @@ const add = async function (toolbox) {
         const { package, version } = DEPENDENCIES[index];
 
         await ignite.addModule(package, { link: packageJSON.dependencies['react-native'] < '0.60.0', version })
+    }
+
+    for (let index = 0; index < DEV_DEPENDENCIES.length; index++) {
+        const { package, version, peerDependency } = DEV_DEPENDENCIES[index];
+
+        if (Object.keys(packageJSON.devDependencies).includes(peerDependency)) {
+            await ignite.addModule(package, { version })
+        }
     }
 
     await toolbox.system.run('pod install', { cwd: `${APP_PATH}/ios` })
@@ -64,6 +79,14 @@ const remove = async function (toolbox) {
         const { package } = DEPENDENCIES[index];
 
         await ignite.removeModule(package, { unlink: packageJSON.dependencies['react-native'] < '0.60.0' });
+    }
+
+    for (let index = 0; index < DEV_DEPENDENCIES.length; index++) {
+        const { package, version, peerDependency } = DEV_DEPENDENCIES[index];
+
+        if (Object.keys(packageJSON.devDependencies).includes(peerDependency)) {
+            await ignite.removeModule(package, { version })
+        }
     }
 
     await toolbox.system.run('pod install', { cwd: `${APP_PATH}/ios` })
