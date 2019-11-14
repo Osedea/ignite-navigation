@@ -39,9 +39,10 @@ const rnScreensPatch = `    implementation 'androidx.appcompat:appcompat:1.1.0-r
 
 const add = async function (toolbox) {
     // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
-    const { ignite } = toolbox
+    const { ignite, print, filesystem } = toolbox
     const APP_PATH = process.cwd()
     const packageJSON = require(`${APP_PATH}/package.json`)
+    const igniteJSON = require(`${APP_PATH}/ignite/ignite.json`)
 
     for (let index = 0; index < DEPENDENCIES.length; index++) {
         const { package, version } = DEPENDENCIES[index];
@@ -53,7 +54,7 @@ const add = async function (toolbox) {
         const { package, version, peerDependency } = DEV_DEPENDENCIES[index];
 
         if (Object.keys(packageJSON.devDependencies).includes(peerDependency)) {
-            await ignite.addModule(package, { version })
+            await ignite.addModule(package, { version, dev: true })
         }
     }
 
@@ -64,6 +65,14 @@ const add = async function (toolbox) {
       insert: rnScreensPatch,
       after: `implementation "com.facebook.react:react-native:.*`
     });
+
+    if (igniteJSON.boilerplate === 'osedea-react-native-boilerplate') {
+        igniteJSON.navigation = 'react-navigation';
+
+        filesystem.write(`${APP_PATH}/ignite/ignite.json`, igniteJSON);
+    }
+
+    print.info('Nice! Be sure to checkout the docs: https://reactnavigation.org/');
 }
 
 /**
@@ -71,9 +80,10 @@ const add = async function (toolbox) {
  */
 const remove = async function (toolbox) {
     // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
-    const { ignite } = toolbox
+    const { ignite, filesystem } = toolbox
     const APP_PATH = process.cwd()
     const packageJSON = require(`${APP_PATH}/package.json`)
+    const igniteJSON = require(`${APP_PATH}/ignite/ignite.json`)
 
     for (let index = 0; index < DEPENDENCIES.length; index++) {
         const { package } = DEPENDENCIES[index];
@@ -85,7 +95,7 @@ const remove = async function (toolbox) {
         const { package, version, peerDependency } = DEV_DEPENDENCIES[index];
 
         if (Object.keys(packageJSON.devDependencies).includes(peerDependency)) {
-            await ignite.removeModule(package, { version })
+            await ignite.removeModule(package, { version, dev: true })
         }
     }
 
@@ -95,6 +105,12 @@ const remove = async function (toolbox) {
     ignite.patchInFile(`${APP_PATH}/android/app/build.gradle`, {
         delete: rnScreensPatch,
     });
+
+    if (igniteJSON.boilerplate === 'osedea-react-native-boilerplate') {
+        igniteJSON.navigation = 'no-navigation';
+
+        filesystem.write(`${APP_PATH}/ignite/ignite.json`, igniteJSON);
+    }
 }
 
 // Required in all Ignite CLI plugins
