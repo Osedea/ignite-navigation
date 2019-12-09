@@ -1,8 +1,14 @@
 {
   "name": "ignite-navigation",
   "description": "A plugin to add react-navigation to your application",
-  "keywords": ["navigation", "react-navigation", "ignite", "react-native", "ignite plugin"],
-  "version": "0.2.0",
+  "keywords": [
+    "navigation",
+    "react-navigation",
+    "ignite",
+    "react-native",
+    "ignite plugin"
+  ],
+  "version": "0.2.1",
   "license": "MIT",
   "author": {
     "name": "Adrien THIERY",
